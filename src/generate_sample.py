@@ -16,7 +16,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 OUT_FILE = ROOT / "data" / "sample" / "applications_sample.xlsx"
 
-rng = np.random.default_rng(42)          # fixed seed = same sample every run
+rng = np.random.default_rng(3)          # fixed seed = same sample every run
 
 N_APPS = 140
 START = date(2026, 6, 15)

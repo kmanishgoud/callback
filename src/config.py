@@ -45,3 +45,4 @@ WORK_MODES = ["On-site", "Hybrid", "Remote"]
 # ---- Thresholds ----
 GHOST_AFTER_DAYS = 21       # no reply after this many days = ghosted
 FOLLOW_UP_AFTER_DAYS = 7    # no reply after this many days = time to follow up
+MATURE_AFTER_DAYS = 14      # only applications this old count towards reply/interview rates
