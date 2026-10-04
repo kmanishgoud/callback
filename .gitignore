@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+
+# Private: never commit
+.env
+data/applications.xlsx
+
+# Generated reports
+output/
