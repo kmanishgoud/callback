@@ -1,0 +1,139 @@
+{%- macro heading(text) -%}
+<div style="font-size:16px;font-weight:bold;color:#0b0b0b;margin:0 0 8px;">{{ text }}</div>
+{%- endmacro -%}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Callback weekly report: {{ week_label }}</title>
+</head>
+<body style="margin:0;padding:0;background:#f6f6f4;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f6f4;">
+<tr><td align="center" style="padding:24px 12px;">
+
+<table role="presentation" width="600" cellpadding="0" cellspacing="0"
+       style="width:100%;max-width:600px;background:#ffffff;border:1px solid #e8e7e3;border-radius:8px;
+              font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:#0b0b0b;">
+
+  <!-- ===== Header ===== -->
+  <tr><td style="padding:24px 28px 8px;">
+    <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#2a78d6;font-weight:bold;">
+      Callback · Weekly job search report
+    </div>
+    <div style="font-size:22px;font-weight:bold;margin-top:4px;">{{ week_label }}</div>
+    <div style="font-size:15px;color:#52514e;margin-top:8px;line-height:1.5;">{{ summary }}</div>
+  </td></tr>
+
+  <!-- ===== Headline tiles ===== -->
+  <tr><td style="padding:12px 22px 4px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+    {% for row in kpi_rows %}
+      <tr>
+      {% for tile in row %}
+        <td width="33%" valign="top" style="padding:6px;">
+          <div style="border:1px solid #e8e7e3;border-radius:6px;padding:12px;">
+            <div style="font-size:12px;color:#52514e;">{{ tile.label }}</div>
+            <div style="font-size:24px;font-weight:bold;margin-top:2px;">{{ tile.value }}</div>
+            <div style="font-size:12px;color:#52514e;margin-top:2px;">{{ tile.note }}</div>
+          </div>
+        </td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
+  </td></tr>
+
+  <!-- ===== This week ===== -->
+  <tr><td style="padding:20px 28px 4px;">
+    {{ heading("This week") }}
+    {% if events %}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
+      {% for e in events %}
+      <tr>
+        <td style="padding:7px 0;border-bottom:1px solid #e8e7e3;color:#52514e;white-space:nowrap;width:95px;">{{ e.date }}</td>
+        <td style="padding:7px 8px;border-bottom:1px solid #e8e7e3;font-weight:bold;white-space:nowrap;width:115px;">{{ e.event }}</td>
+        <td style="padding:7px 0;border-bottom:1px solid #e8e7e3;">{{ e.company }} <span style="color:#52514e;">· {{ e.role }}</span></td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <div style="font-size:14px;color:#52514e;">No replies or interviews this week.</div>
+    {% endif %}
+  </td></tr>
+
+  <!-- ===== Follow up ===== -->
+  <tr><td style="padding:20px 28px 4px;">
+    {{ heading("Follow up this week (" ~ follow_up_total ~ ")") }}
+    {% if follow_ups %}
+    <div style="font-size:13px;color:#52514e;margin-bottom:6px;">
+      No reply after {{ follow_up_days }}–{{ ghost_days }} days. A short, polite nudge often gets a response.
+    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
+      {% for f in follow_ups %}
+      <tr>
+        <td style="padding:6px 0;border-bottom:1px solid #e8e7e3;">{{ f.company }} <span style="color:#52514e;">· {{ f.role }}</span></td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e8e7e3;color:#52514e;white-space:nowrap;">{{ f.source }}</td>
+        <td align="right" style="padding:6px 0;border-bottom:1px solid #e8e7e3;color:#52514e;white-space:nowrap;">{{ f.days }} days</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% if follow_up_total > follow_ups|length %}
+    <div style="font-size:13px;color:#52514e;margin-top:6px;">…and {{ follow_up_total - follow_ups|length }} more in your tracker.</div>
+    {% endif %}
+    {% else %}
+    <div style="font-size:14px;color:#52514e;">Nothing to chase. Nice.</div>
+    {% endif %}
+
+    {% if ghosted %}
+    <div style="font-size:13px;color:#52514e;margin-top:12px;line-height:1.5;">
+      <b style="color:#0b0b0b;">Went silent this week ({{ ghosted|length }}):</b> {{ ghosted|join(", ") }}
+    </div>
+    {% endif %}
+  </td></tr>
+
+  <!-- ===== Charts ===== -->
+  {% for c in charts %}
+  <tr><td style="padding:24px 28px 0;">
+    {{ heading(c.title) }}
+    {% if c.note %}<div style="font-size:13px;color:#52514e;margin-bottom:6px;line-height:1.5;">{{ c.note }}</div>{% endif %}
+    <img src="{{ c.src }}" width="544" alt="{{ c.title }}"
+         style="display:block;width:100%;max-width:544px;height:auto;border:0;">
+  </td></tr>
+  {% endfor %}
+
+  <!-- ===== Pipeline ===== -->
+  <tr><td style="padding:24px 28px 4px;">
+    {{ heading("Pipeline") }}
+    <div style="font-size:14px;color:#52514e;line-height:1.8;">
+      {% for s in status %}<b style="color:#0b0b0b;">{{ s.count }}</b> {{ s.label }}{% if not loop.last %} &nbsp;·&nbsp; {% endif %}{% endfor %}
+    </div>
+  </td></tr>
+
+  <!-- ===== Tracker health ===== -->
+  {% if issues_total %}
+  <tr><td style="padding:20px 28px 4px;">
+    {{ heading("Tracker health") }}
+    <div style="font-size:13px;color:#52514e;margin-bottom:6px;">
+      {{ issues_fixed }} fixed automatically · {{ attention|length }} need your attention
+    </div>
+    {% for i in attention %}
+    <div style="font-size:13px;color:#0b0b0b;padding:3px 0;">⚠ <b>{{ i.app_id }}</b>: {{ i.message }}</div>
+    {% endfor %}
+  </td></tr>
+  {% endif %}
+
+  <!-- ===== Footer ===== -->
+  <tr><td style="padding:24px 28px;">
+    <div style="border-top:1px solid #e8e7e3;padding-top:12px;font-size:11px;color:#52514e;line-height:1.6;">
+      Generated automatically by Callback on {{ generated_on }}.
+      Rates count only applications at least {{ mature_days }} days old ({{ mature_apps }} of {{ total_apps }}).
+      {% if using_sample %}<b>Sample data.</b>{% endif %}
+    </div>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>
